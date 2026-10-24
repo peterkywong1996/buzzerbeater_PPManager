@@ -9,6 +9,10 @@ const port = process.env.PORT || 3000; // const PORT = 3000
 const OVERRIDE_FILE = path.join(__dirname, 'players_override.json');
 const LINEUPS_KEY = '__saved_lineups__'; // 特殊 Key 用於存儲陣容
 
+app.get('/', (req, res) => {
+    res.send('Hello from Vercel!');
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '5mb' }));
 
