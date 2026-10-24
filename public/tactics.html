@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戰術編排室 - BuzzerBeater</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .analysis-panel { max-height: calc(100vh - 120px); overflow-y: auto; }
+        .analysis-panel::-webkit-scrollbar { width: 6px; }
+        .analysis-panel::-webkit-scrollbar-track { background: #1e293b; }
+        .analysis-panel::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        .highlight-max { background-color: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-weight: bold; border-radius: 4px; padding: 2px 6px; }
+        .highlight-fatigue { color: #f87171; font-weight: bold; background-color: rgba(239, 68, 68, 0.15); padding: 2px 6px; border-radius: 4px; }
+        .compact-checkbox { accent-color: currentColor; width: 1rem; height: 1rem; cursor: pointer; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <nav class="bg-slate-900 border-b border-slate-700 p-4 shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">⚔️ <span class="text-emerald-400">戰術編排室</span></h1>
+            <div class="flex gap-2 flex-wrap">
+                <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition font-semibold">PP球隊總覽</a>
+                <a href="/tactics.html" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition font-semibold">⚔️ 排兵佈陣</a>
+                <a href="/manage.html" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 transition font-semibold">⚙️ 球員數據庫</a>
+                <a href="/stadium.html" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition font-semibold">🏟️ 場館打理</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- 全隊負載與陣容配置一體化表格 -->
+            <div class="card rounded-xl shadow-lg p-5">
+                <div class="flex justify-between items-center mb-3 border-b border-slate-700 pb-2">
+                    <h2 class="text-xl font-bold text-white">📋 陣容配置圖，當前及預計上陣時間 (黃框正選+36，綠框替補+12)</h2>
+                    <button onclick="clearAllSlots()" class="px-4 py-1.5 bg-red-900/50 hover:bg-red-800 text-red-300 text-sm rounded border border-red-700 transition">🗑️ 一鍵清空</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center border-collapse text-sm">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-700">
+                                <th class="px-3 py-1.5 text-left w-32">球員</th>
+                                <th class="px-2 py-1.5 text-center w-24">狀態<br><span class="text-[10px] font-normal">年齡/潛力</span></th>
+                                <th class="px-2 py-1.5 text-center">PG</th>
+                                <th class="px-2 py-1.5 text-center">SG</th>
+                                <th class="px-2 py-1.5 text-center">SF</th>
+                                <th class="px-2 py-1.5 text-center">PF</th>
+                                <th class="px-2 py-1.5 text-center">C</th>
+                                <th class="px-3 py-1.5 text-center bg-slate-800 rounded-t w-24">全位置總計</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overview-tbody"></tbody>
+                    </table>
+                </div>
+                <div class="mt-3 flex gap-4 text-xs text-slate-500 justify-end">
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm border-2 border-yellow-400 bg-yellow-400/20"></span> 正選 (+36m)</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm border-2 border-green-400 bg-green-400/20"></span> 替補 (+12m)</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-slate-500/20 border border-slate-500"></span> 後備 (+0m)</span>
+                </div>
+            </div>
+
+            <!-- 陣容管理 -->
+            <div class="card rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-white mb-4 border-b border-slate-700 pb-2">💾 陣容管理及多維度比較</h2>
+                <div class="flex gap-3 mb-4">
+                    <input type="text" id="lineup-name" placeholder="輸入陣容名稱" class="flex-1 bg-slate-900 border border-slate-600 text-white rounded px-4 py-3 text-lg">
+                    <button onclick="saveCurrentLineup()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded transition text-lg">保存當前陣容</button>
+                </div>
+                <div id="saved-lineups-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6"></div>
+                <div id="comparison-area" class="hidden border-t border-slate-700 pt-6">
+                    <h3 class="text-xl font-bold text-cyan-400 mb-4">📊 陣容能力對比 (最高值高亮)</h3>
+                    <div class="overflow-x-auto mb-6">
+                        <table class="w-full text-left border-collapse text-lg" id="comparison-table">
+                            <thead id="comp-thead"></thead>
+                            <tbody id="comp-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                        <canvas id="radar-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側評估面板 -->
+        <div class="lg:col-span-1">
+            <div class="card rounded-xl shadow-lg p-6 sticky top-24 analysis-panel space-y-6">
+                
+                <!-- 【新增】當前陣容名單表格 -->
+                <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <h3 class="text-lg font-bold text-slate-300 mb-3 uppercase tracking-wider">📋 出場名單</h3>
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-700">
+                                <th class="py-2 text-left w-12">位置</th>
+                                <th class="py-2 text-center text-yellow-400">正選</th>
+                                <th class="py-2 text-center text-green-400">替補</th>
+                                <th class="py-2 text-center text-slate-400">後備</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lineup-roster-tbody"></tbody>
+                    </table>
+                </div>
+
+                <h2 class="text-2xl font-bold text-white border-b border-slate-700 pb-3">📊 陣容評估</h2>
+                <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <h3 class="text-lg font-bold text-slate-300 mb-3 uppercase tracking-wider">⚖️ 整體實力</h3>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="p-4 bg-cyan-900/20 border border-cyan-800/30 rounded">
+                            <div class="text-base text-cyan-400 mb-1">外線平均值</div>
+                            <div class="text-4xl font-bold text-white" id="avg-outside">0.0</div>
+                        </div>
+                        <div class="p-4 bg-rose-900/20 border border-rose-800/30 rounded">
+                            <div class="text-base text-rose-400 mb-1">內線平均值</div>
+                            <div class="text-4xl font-bold text-white" id="avg-inside">0.0</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-300 mb-3 uppercase tracking-wider">📈 所有指標平均值</h3>
+                    <div class="grid grid-cols-2 gap-3 text-lg" id="skills-avg"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allPlayers = [];
+        const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
+        const levels = ['starter', 'backup', 'reserve'];
+        const levelMins = { starter: 36, backup: 12, reserve: 0 };
+        const allSkillKeys = ['jumpShot', 'range', 'outsideDef', 'handling', 'driving', 'passing', 'insideShot', 'insideDef', 'rebound', 'block', 'stamina', 'freeThrow', 'experience'];
+        const skillLabels = { jumpShot:'跳投', range:'射程', outsideDef:'外防', handling:'控球', driving:'突破', passing:'傳球', insideShot:'內投', insideDef:'內防', rebound:'籃板', block:'封截', stamina:'體能', freeThrow:'罰球', experience:'經驗' };
+
+        let lineup = {};
+        positions.forEach(pos => { lineup[pos] = { starter: null, backup: null, reserve: null }; });
+        let savedLineups = [];
+        let radarChart = null;
+
+        function calculateAllTimes() {
+            const playerTimes = {};
+            allPlayers.forEach(p => {
+                const pm = p.stats.positionMinutes || { PG:0, SG:0, SF:0, PF:0, C:0 };
+                playerTimes[p.id] = { current: { ...pm }, added: { PG:0, SG:0, SF:0, PF:0, C:0 } };
+            });
+            positions.forEach(pos => {
+                levels.forEach(level => {
+                    const pid = lineup[pos][level];
+                    if (pid && playerTimes[pid]) playerTimes[pid].added[pos] += levelMins[level];
+                });
+            });
+            Object.keys(playerTimes).forEach(pid => {
+                const pt = playerTimes[pid];
+                pt.est = {}; pt.estAll = 0; pt.currentAll = 0;
+                positions.forEach(pos => {
+                    pt.est[pos] = pt.current[pos] + pt.added[pos];
+                    pt.estAll += pt.est[pos]; pt.currentAll += pt.current[pos];
+                });
+            });
+            return playerTimes;
+        }
+
+        async function loadData() {
+            try {
+                const [teamRes, lineupsRes] = await Promise.all([fetch('/api/team-data'), fetch('/api/lineups')]);
+                allPlayers = await teamRes.json();
+                savedLineups = await lineupsRes.json();
+                if (savedLineups.length > 0) lineup = JSON.parse(JSON.stringify(savedLineups[savedLineups.length - 1].lineup));
+                renderAll();
+                renderSavedLineups();
+            } catch (err) { console.error("載入數據失敗:", err); }
+        }
+
+        function renderAll() { 
+            renderOverviewTable();
+            renderLineupRoster(); // 新增：渲染右側名單
+            renderAnalysis(); 
+        }
+
+        // 【新增】渲染右側陣容名單表格
+        function renderLineupRoster() {
+            const tbody = document.getElementById('lineup-roster-tbody');
+            if(!tbody) return;
+            let html = '';
+            positions.forEach(pos => {
+                const starterId = lineup[pos]['starter'];
+                const backupId = lineup[pos]['backup'];
+                const reserveId = lineup[pos]['reserve'];
+
+                const getPlayerName = (id) => {
+                    if(!id) return '<span class="text-slate-600">-</span>';
+                    const p = allPlayers.find(pl => pl.id === id);
+                    return p ? `<span class="text-white font-bold text-xs">#${p.jersey} ${p.firstName} ${p.lastName}</span>` : '-';
+                };
+
+                html += `
+                    <tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+                        <td class="py-2 text-left text-cyan-400 font-bold">${pos}</td>
+                        <td class="py-2 text-center">${getPlayerName(starterId)}</td>
+                        <td class="py-2 text-center">${getPlayerName(backupId)}</td>
+                        <td class="py-2 text-center">${getPlayerName(reserveId)}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // 渲染全隊負載與配置表格 (加入黃/綠外框邏輯)
+        function renderOverviewTable() {
+            const playerTimes = calculateAllTimes();
+            const tbody = document.getElementById('overview-tbody');
+            let html = '';
+            
+            allPlayers.forEach(p => {
+                const pt = playerTimes[p.id];
+                const highlight = (val) => val > 48 ? 'highlight-fatigue' : 'text-emerald-300';
+                
+                const shape = p.skills.gameShape;
+                const shapeColor = shape >= 7 ? 'text-emerald-400' : (shape >= 5 ? 'text-amber-400' : 'text-red-400');
+                const pot = p.skills.potential;
+                const potColor = pot >= 7 ? 'text-emerald-400' : (pot >= 5 ? 'text-amber-400' : 'text-slate-400');
+
+                let posCells = '';
+                positions.forEach(pos => {
+                    const cur = pt.current[pos];
+                    const est = pt.est[pos];
+                    
+                    // 【核心】判斷狀態並決定外框顏色
+                    const isStarter = lineup[pos]['starter'] === p.id;
+                    const isBackup = lineup[pos]['backup'] === p.id;
+                    
+                    let cellBorderClass = 'p-1.5';
+                    if (isStarter) {
+                        cellBorderClass = 'border-2 border-yellow-400 bg-yellow-400/10 rounded-lg p-1.5'; // 黃色外框
+                    } else if (isBackup) {
+                        cellBorderClass = 'border-2 border-green-400 bg-green-400/10 rounded-lg p-1.5'; // 綠色外框
+                    }
+
+                    const genCheckbox = (lvl, colorClass, label) => {
+                        const isChecked = lineup[pos][lvl] === p.id ? 'checked' : '';
+                        return `
+                            <label class="flex flex-col items-center cursor-pointer group" title="${label} (+${levelMins[lvl]}m)">
+                                <input type="checkbox" class="compact-checkbox ${colorClass}" 
+                                    ${isChecked} 
+                                    onchange="toggleLineup('${p.id}', '${pos}', '${lvl}', this.checked)">
+                                <span class="text-[10px] font-bold mt-0.5 ${colorClass.replace('accent-', 'text-')}">${label}</span>
+                            </label>
+                        `;
+                    };
+
+                    posCells += `
+                        <td class="px-2 py-1.5 border-b border-slate-800/50">
+                            <div class="${cellBorderClass}">
+                                <div class="flex items-center justify-center gap-2 mb-1">
+                                    <span class="text-base font-bold text-slate-400 w-6 text-right">${cur}</span>
+                                    <span class="text-xs text-slate-600">→</span>
+                                    <span class="text-lg font-bold ${highlight(est)} w-6 text-left">${est}</span>
+                                </div>
+                                <div class="flex items-center justify-center gap-2 pt-1 border-t border-slate-700/50">
+                                    ${genCheckbox('starter', 'accent-emerald-500', '正')}
+                                    ${genCheckbox('backup', 'accent-blue-500', '替')}
+                                    ${genCheckbox('reserve', 'accent-slate-500', '後')}
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                });
+
+                html += `
+                    <tr class="hover:bg-slate-800/40 transition-colors">
+                        <td class="px-3 py-1.5 text-left text-base text-white font-bold whitespace-nowrap border-b border-slate-800/50">
+                            #${p.jersey} ${p.firstName} ${p.lastName}
+                        </td>
+                        <td class="px-2 py-1.5 text-center border-b border-slate-800/50">
+                            <div class="text-lg font-bold ${shapeColor}">${shape}</div>
+                            <div class="text-xs text-slate-400 mt-0.5">
+                                ${p.age}歲 / <span class="${potColor} font-bold">${pot}</span>
+                            </div>
+                        </td>
+                        ${posCells}
+                        <td class="px-3 py-1.5 text-center bg-slate-900/30 border-b border-slate-800/50">
+                            <div class="text-base font-bold text-slate-400">${pt.currentAll}m</div>
+                            <div class="text-xl font-bold ${highlight(pt.estAll)}">${pt.estAll}m</div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        window.toggleLineup = function(playerId, pos, level, isChecked) {
+            if (isChecked) {
+                lineup[pos][level] = playerId;
+            } else {
+                if (lineup[pos][level] === playerId) {
+                    lineup[pos][level] = null;
+                }
+            }
+            renderAll(); 
+        };
+
+        window.clearAllSlots = function() {
+            // if(!confirm('確定要清空所有陣容配置嗎？')) return;
+            positions.forEach(pos => levels.forEach(level => { lineup[pos][level] = null; }));
+            renderAll();
+        };
+
+        function getUniqueSelectedIds() {
+            const ids = new Set();
+            positions.forEach(pos => levels.forEach(level => { if (lineup[pos][level]) ids.add(lineup[pos][level]); }));
+            return Array.from(ids);
+        }
+
+        function renderAnalysis() {
+            const uniqueIds = getUniqueSelectedIds();
+            const selectedPlayers = uniqueIds.map(id => allPlayers.find(p => p.id === id)).filter(p => p);
+            const count = selectedPlayers.length || 1;
+            let totalOutside = 0, totalInside = 0;
+            const skillTotals = {};
+            allSkillKeys.forEach(k => skillTotals[k] = 0);
+            selectedPlayers.forEach(p => {
+                totalOutside += p.skills.outsideTotal; totalInside += p.skills.insideTotal;
+                allSkillKeys.forEach(k => skillTotals[k] += p.skills[k]);
+            });
+            document.getElementById('avg-outside').textContent = (totalOutside / count).toFixed(1);
+            document.getElementById('avg-inside').textContent = (totalInside / count).toFixed(1);
+            const avgContainer = document.getElementById('skills-avg');
+            let avgHtml = '';
+            allSkillKeys.forEach(k => {
+                const avg = (skillTotals[k] / count).toFixed(1);
+                let colorClass = 'text-slate-300';
+                if (['jumpShot', 'range', 'outsideDef', 'handling', 'driving', 'passing'].includes(k)) colorClass = 'text-cyan-400';
+                else if (['insideShot', 'insideDef', 'rebound', 'block'].includes(k)) colorClass = 'text-rose-400';
+                else colorClass = 'text-purple-400';
+                avgHtml += `<div class="flex justify-between p-3 bg-slate-800/50 rounded border border-slate-700"><span class="${colorClass}">${skillLabels[k]}</span><span class="text-white font-bold">${avg}</span></div>`;
+            });
+            avgContainer.innerHTML = avgHtml;
+        }
+
+        // ================= 陣容管理 =================
+        async function saveCurrentLineup() {
+            const name = document.getElementById('lineup-name').value.trim();
+            if (!name) return alert('請輸入陣容名稱');
+            try {
+                const uniqueIds = getUniqueSelectedIds();
+                const players = uniqueIds.map(id => allPlayers.find(p => p.id === id)).filter(p => p);
+                const avgSkills = {};
+                const count = players.length || 1;
+                allSkillKeys.forEach(k => { avgSkills[k] = parseFloat((players.reduce((sum, p) => sum + p.skills[k], 0) / count).toFixed(1)); });
+                avgSkills.outsideAvg = parseFloat((players.reduce((sum, p) => sum + p.skills.outsideTotal, 0) / count).toFixed(1));
+                avgSkills.insideAvg = parseFloat((players.reduce((sum, p) => sum + p.skills.insideTotal, 0) / count).toFixed(1));
+                
+                const res = await fetch('/api/lineups', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'save', data: { name, lineup: JSON.parse(JSON.stringify(lineup)), avgSkills } })
+                });
+                const result = await res.json();
+                savedLineups = result.lineups;
+                document.getElementById('lineup-name').value = '';
+                renderSavedLineups();
+            } catch (err) { alert('保存失敗'); }
+        }
+
+        async function deleteLineup(id) {
+            if(!confirm('確定刪除此陣容？')) return;
+            const res = await fetch('/api/lineups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete', id }) });
+            const result = await res.json();
+            savedLineups = result.lineups;
+            renderSavedLineups(); renderComparison();
+        }
+
+        function applyLineup(id) {
+            const target = savedLineups.find(l => l.id === id);
+            if (target) { lineup = JSON.parse(JSON.stringify(target.lineup)); renderAll(); }
+        }
+
+        function renderSavedLineups() {
+            const container = document.getElementById('saved-lineups-list');
+            if (savedLineups.length === 0) { container.innerHTML = '<div class="text-slate-500 col-span-2 text-center py-4 text-lg">尚未保存任何陣容</div>'; return; }
+            container.innerHTML = savedLineups.map(l => `
+                <div class="flex items-center justify-between p-4 bg-slate-800 rounded-lg border border-slate-700">
+                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                        <input type="checkbox" class="compare-check w-5 h-5 accent-emerald-500" value="${l.id}" onchange="renderComparison()">
+                        <span class="text-white font-bold text-lg truncate">${l.name}</span>
+                    </label>
+                    <div class="flex gap-2">
+                        <button onclick="applyLineup('${l.id}')" class="text-cyan-400 hover:text-cyan-300 text-base font-bold">套用</button>
+                        <button onclick="deleteLineup('${l.id}')" class="text-red-400 hover:text-red-300 text-base">刪除</button>
+                    </div>
+                </div>
+            `).join('');
+            renderComparison();
+        }
+
+        function renderComparison() {
+            const checkedIds = Array.from(document.querySelectorAll('.compare-check:checked')).map(cb => cb.value);
+            const selected = savedLineups.filter(l => checkedIds.includes(l.id));
+            const area = document.getElementById('comparison-area');
+            if (selected.length < 2) { area.classList.add('hidden'); if(radarChart) { radarChart.destroy(); radarChart = null; } return; }
+            area.classList.remove('hidden');
+
+            const maxVals = {};
+            allSkillKeys.forEach(k => { maxVals[k] = Math.max(...selected.map(s => s.avgSkills[k])); });
+            maxVals.outsideAvg = Math.max(...selected.map(s => s.avgSkills.outsideAvg));
+            maxVals.insideAvg = Math.max(...selected.map(s => s.avgSkills.insideAvg));
+
+            const thead = document.getElementById('comp-thead');
+            const tbody = document.getElementById('comp-tbody');
+            thead.innerHTML = `<tr class="border-b border-slate-600 text-slate-400"><th class="p-3 text-left text-lg">指標</th>${selected.map(s => `<th class="p-3 text-center text-lg">${s.name}</th>`).join('')}</tr>`;
+            
+            const displayKeys = [...allSkillKeys, 'outsideAvg', 'insideAvg'];
+            const displayLabels = { ...skillLabels, outsideAvg: '外線平均', insideAvg: '內線平均' };
+            
+            let tbodyHtml = '';
+            displayKeys.forEach(k => {
+                let row = `<tr class="border-b border-slate-800"><td class="p-3 text-slate-300 text-lg">${displayLabels[k]}</td>`;
+                selected.forEach(s => {
+                    const val = s.avgSkills[k];
+                    const isMax = val === maxVals[k];
+                    row += `<td class="p-3 text-center text-lg ${isMax ? 'highlight-max' : 'text-slate-400'}">${val}</td>`;
+                });
+                row += '</tr>';
+                tbodyHtml += row;
+            });
+            tbody.innerHTML = tbodyHtml;
+
+            if (radarChart) radarChart.destroy();
+            const ctx = document.getElementById('radar-chart').getContext('2d');
+            const colors = ['rgba(56, 189, 248, 0.6)', 'rgba(244, 114, 182, 0.6)', 'rgba(52, 211, 153, 0.6)', 'rgba(251, 191, 36, 0.6)'];
+            const borderColors = ['rgb(56, 189, 248)', 'rgb(244, 114, 182)', 'rgb(52, 211, 153)', 'rgb(251, 191, 36)'];
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: displayKeys.map(k => displayLabels[k]),
+                    datasets: selected.map((s, idx) => ({
+                        label: s.name, data: displayKeys.map(k => s.avgSkills[k]),
+                        backgroundColor: colors[idx % colors.length], borderColor: borderColors[idx % borderColors.length], borderWidth: 2
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    scales: { r: { angleLines: { color: '#475569' }, grid: { color: '#475569' }, pointLabels: { color: '#e2e8f0', font: { size: 14 } }, ticks: { color: '#94a3b8', backdropColor: 'transparent' } } },
+                    plugins: { legend: { labels: { color: '#e2e8f0', font: { size: 14 } } } }
+                }
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

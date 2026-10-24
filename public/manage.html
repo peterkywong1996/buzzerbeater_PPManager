@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>球員數據庫 - BuzzerBeater</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        input[type="number"] { background-color: #0f172a; border: 1px solid #475569; color: #fff; }
+        input[type="number"]:focus { outline: none; border-color: #f59e0b; }
+        .main-content { padding-bottom: 160px; }
+        .chevron { transition: transform 0.2s; }
+        .chevron-open { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <nav class="bg-slate-900 border-b border-slate-700 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">⚙️ <span class="text-amber-400">球員數據庫</span></h1>
+            <div class="flex gap-2 flex-wrap">
+                <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition font-semibold">PP球隊總覽</a>
+                <a href="/tactics.html" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition font-semibold">⚔️ 排兵佈陣</a>
+                <a href="/manage.html" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 transition font-semibold">⚙️ 球員數據庫</a>
+                <a href="/stadium.html" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition font-semibold">🏟️ 場館打理</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-6 main-content">
+        <div class="card rounded-xl p-6 border-amber-500/50 bg-amber-900/10 mb-6">
+            <h2 class="text-lg font-bold text-amber-400 mb-2">💡系統以手動輸入的數據為準，重置數據後則使用API獲取的數據。</h2>
+            <p class="text-base text-slate-300">點擊球員卡片可展開編輯技能與各位置上場時間。修改完成後，請點擊底部的「保存修改」。</p>
+        </div>
+        <div id="players-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    </div>
+
+    <div class="container mx-auto p-2 main-content">
+        <div class="card rounded-xl p-2 border-amber-500/50 bg-amber-900/10 mb-6">
+            <p class="text-base text-slate-300">正在獲取API數據及最新修改的數據......</p>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-sm border-t border-slate-700 p-4 shadow-2xl z-40">
+        <div class="container mx-auto flex justify-between items-center">
+            <p class="text-base text-slate-400 hidden md:block">提示：修改後請點擊保存，否則無效。</p>
+            <div class="flex gap-3 w-full md:w-auto flex-wrap">
+                <button onclick="resetAll()" class="flex-1 md:flex-none px-6 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold rounded-lg transition text-lg">🔄 重置所有</button>
+                <button onclick="resetAllTimes()" class="flex-1 md:flex-none px-6 py-3 bg-rose-900/50 hover:bg-rose-800 text-rose-300 font-bold rounded-lg transition text-lg border border-rose-700">⏱️ 重置所有時間</button>
+                <button id="save-all-btn" onclick="saveAll()" class="flex-1 md:flex-none px-8 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition text-xl shadow-lg shadow-amber-900/50">💾 保存所有修改</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allPlayers = [];
+        const skillKeys = ['jumpShot', 'range', 'outsideDef', 'handling', 'driving', 'passing', 'insideShot', 'insideDef', 'rebound', 'block', 'stamina', 'freeThrow', 'experience'];
+        const skillLabels = { jumpShot:'跳投', range:'射程', outsideDef:'外防', handling:'控球', driving:'突破', passing:'傳球', insideShot:'內投', insideDef:'內防', rebound:'籃板', block:'封截', stamina:'體能', freeThrow:'罰球', experience:'經驗' };
+        const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
+
+        async function loadData() {
+            try {
+                const res = await fetch('/api/team-data');
+                allPlayers = await res.json();
+                renderManage();
+            } catch (err) { console.error("載入失敗:", err); }
+        }
+
+        function toggleCard(id) {
+            document.getElementById(`details-${id}`).classList.toggle('hidden');
+            document.getElementById(`chevron-${id}`).classList.toggle('chevron-open');
+        }
+
+        function renderManage() {
+            const container = document.getElementById('players-container');
+            container.innerHTML = '';
+
+            allPlayers.forEach(p => {
+                const s = p.skills;
+                const finalPosition = p.stats.bestPosition || p.bestPosition;
+                const pm = p.stats.positionMinutes || { PG:0, SG:0, SF:0, PF:0, C:0 };
+                const shapeColor = s.gameShape >= 7 ? 'text-emerald-400' : (s.gameShape >= 5 ? 'text-amber-400' : 'text-red-400');
+                const potColor = s.potential >= 7 ? 'text-emerald-400' : (s.potential >= 5 ? 'text-amber-400' : 'text-slate-400');
+
+                const card = document.createElement('div');
+                card.className = 'card rounded-xl p-5 player-card';
+                card.dataset.playerId = p.id;
+                
+                let inputsHtml = skillKeys.map(key => `
+                    <div class="flex items-center justify-between gap-2">
+                        <label class="text-base text-slate-400 w-16">${skillLabels[key]}</label>
+                        <input type="number" min="0" max="20" value="${s[key]}" data-skill="${key}" class="skill-input w-full px-2 py-2 rounded text-lg text-center font-bold">
+                    </div>
+                `).join('');
+
+                let posInputsHtml = positions.map(pos => `
+                    <div class="text-center">
+                        <div class="text-sm text-slate-500 font-bold mb-1">${pos}</div>
+                        <input type="number" min="0" value="${pm[pos]}" data-pos="${pos}" class="pos-min-input w-full px-1 py-2 rounded text-lg text-center bg-slate-900 border border-slate-600 text-cyan-300 font-bold">
+                    </div>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center cursor-pointer" onclick="toggleCard('${p.id}')">
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">#${p.jersey} ${p.firstName} ${p.lastName}</h3>
+                                <div class="text-base text-slate-400">${finalPosition} | ${p.age}歲</div>
+                                <!-- 【新增】折疊狀態下顯示各位置當前時間 -->
+                                <div class="text-sm text-cyan-400 mt-1 font-mono">
+                                    PG:<span class="font-bold text-white">${pm.PG}</span> 
+                                    SG:<span class="font-bold text-white">${pm.SG}</span> 
+                                    SF:<span class="font-bold text-white">${pm.SF}</span> 
+                                    PF:<span class="font-bold text-white">${pm.PF}</span> 
+                                    C:<span class="font-bold text-white">${pm.C}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 ml-4">
+                                <div class="text-center border-r border-slate-700 pr-4">
+                                    <div class="text-xs text-slate-500 uppercase">狀態</div>
+                                    <div class="text-3xl font-bold ${shapeColor}">${s.gameShape}</div>
+                                </div>
+                                <div class="text-center border-r border-slate-700 pr-4">
+                                    <div class="text-xs text-slate-500 uppercase">潛力</div>
+                                    <div class="text-3xl font-bold ${potColor}">${s.potential}</div>
+                                </div>
+                                <div class="text-center border-r border-slate-700 pr-4">
+                                    <div class="text-xs text-cyan-400 uppercase">外線</div>
+                                    <div class="text-2xl font-bold text-cyan-300">${s.outsideTotal}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xs text-rose-400 uppercase">內線</div>
+                                    <div class="text-2xl font-bold text-rose-300">${s.insideTotal}</div>
+                                </div>
+                            </div>
+                            ${p.isOverridden ? '<span class="ml-2 px-2 py-1 bg-amber-900 text-amber-300 text-sm rounded">已修正</span>' : ''}
+                        </div>
+                        <svg id="chevron-${p.id}" class="chevron w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </div>
+
+                    <div id="details-${p.id}" class="hidden mt-6 border-t border-slate-700 pt-6">
+                        <div class="mb-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700 flex flex-wrap items-center gap-4">
+                            <label class="text-base text-slate-300 font-bold">📍 最佳位置 (Best Position):</label>
+                            <select class="best-pos-select bg-slate-900 border border-slate-600 text-white rounded px-3 py-2 text-lg font-bold" data-player-id="${p.id}">
+                                <option value="PG" ${finalPosition === 'PG' ? 'selected' : ''}>PG (控球後衛)</option>
+                                <option value="SG" ${finalPosition === 'SG' ? 'selected' : ''}>SG (得分後衛)</option>
+                                <option value="SF" ${finalPosition === 'SF' ? 'selected' : ''}>SF (小前鋒)</option>
+                                <option value="PF" ${finalPosition === 'PF' ? 'selected' : ''}>PF (大前鋒)</option>
+                                <option value="C" ${finalPosition === 'C' ? 'selected' : ''}>C (中鋒)</option>
+                            </select>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-300 mb-3">技能數值</h4>
+                        <div class="grid grid-cols-2 gap-x-6 gap-y-4 mb-6">${inputsHtml}</div>
+                        <h4 class="text-lg font-bold text-slate-300 mb-3">本週各位置上場時間 (分鐘)</h4>
+                        <div class="grid grid-cols-5 gap-3 mb-2">${posInputsHtml}</div>
+                        <div class="text-right text-base text-slate-400 mb-6">總計: <span class="total-pos-min text-white font-bold text-xl">0</span> min</div>
+                        <div class="flex justify-end">
+                            <button onclick="event.stopPropagation(); resetPlayer('${p.id}')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-base font-bold rounded transition">重置此球員</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+                
+                const posInputs = card.querySelectorAll('.pos-min-input');
+                const totalSpan = card.querySelector('.total-pos-min');
+                const updateTotal = () => {
+                    let sum = 0;
+                    posInputs.forEach(i => sum += (parseInt(i.value) || 0));
+                    totalSpan.textContent = sum;
+                };
+                posInputs.forEach(i => i.addEventListener('input', updateTotal));
+                updateTotal();
+            });
+        }
+
+        async function saveAll() {
+            const btn = document.getElementById('save-all-btn');
+            btn.innerHTML = '⏳ 保存中...'; btn.disabled = true;
+            const updates = [];
+            document.querySelectorAll('.player-card').forEach(card => {
+                const id = card.dataset.playerId;
+                const skills = {};
+                card.querySelectorAll('.skill-input').forEach(i => skills[i.dataset.skill] = parseInt(i.value) || 0);
+
+                const positionMinutes = {};
+
+                card.querySelectorAll('.pos-min-input').forEach(i => positionMinutes[i.dataset.pos] = parseInt(i.value) || 0);
+                
+                // 【新增】讀取手動修改的最佳位置
+                const bestPosition = card.querySelector('.best-pos-select').value;
+                
+                // 【修改】將 bestPosition 一併放入 stats 中發送給後端
+                const stats = { positionMinutes, bestPosition };
+                updates.push({ id, skills, stats });
+
+            });
+            try {
+                await fetch('/api/update-players-batch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ updates }) });
+                btn.innerHTML = '✅ 全部保存成功!'; btn.classList.remove('bg-amber-600'); btn.classList.add('bg-emerald-600');
+                setTimeout(() => location.reload(), 1000);
+            } catch (err) { alert('保存失敗'); btn.innerHTML = '💾 保存所有修改'; btn.disabled = false; }
+        }
+
+        async function resetAll() {
+            if (!confirm('⚠️ 確定要清空所有球員的手動修正嗎？')) return;
+            await fetch('/api/update-players-batch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ updates: allPlayers.map(p => ({ id: p.id, skills: {}, stats: {} })) }) });
+            alert('✅ 所有的手動修正已重置！');
+            location.reload();
+        }
+
+        async function resetAllTimes() {
+            if (!confirm('⚠️ 確定要將所有球員的各位置上場時間全部重置為 0 嗎？（技能數值不會受影響）')) return;
+            
+            const updates = allPlayers.map(p => {
+                // 為了避免後端覆蓋技能，必須讀取當前頁面上的技能數值一併提交
+                const card = document.querySelector(`.player-card[data-player-id="${p.id}"]`);
+                const currentSkills = {};
+                if (card) {
+                    card.querySelectorAll('.skill-input').forEach(i => {
+                        currentSkills[i.dataset.skill] = parseInt(i.value) || 0;
+                    });
+                } else {
+                    // 防呆：如果卡片未渲染，則使用記憶體中的原始技能數據
+                    Object.keys(p.skills).forEach(k => {
+                        if (k !== 'outsideTotal' && k !== 'insideTotal') currentSkills[k] = p.skills[k];
+                    });
+                }
+                
+                return {
+                    id: p.id,
+                    skills: currentSkills, // 保留當前技能
+                    stats: { positionMinutes: { PG: 0, SG: 0, SF: 0, PF: 0, C: 0 } } // 僅重置時間為 0
+                };
+            });
+            
+            try {
+                await fetch('/api/update-players-batch', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ updates }) 
+                });
+                alert('✅ 所有位置上場時間已重置為 0！');
+                location.reload();
+            } catch (err) { 
+                console.error(err);
+                alert('重置失敗'); 
+            }
+        }
+
+        async function resetPlayer(id) {
+            if (!confirm('確定要僅清除此球員的手動修正嗎？')) return;
+            await fetch('/api/update-players-batch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ updates: [{ id, skills: {}, stats: {} }] }) });
+            location.reload();
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

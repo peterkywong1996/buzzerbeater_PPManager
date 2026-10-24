@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuzzerBeater 經理儀表板 - PPManager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .bar-bg { background-color: #334155; }
+        .tab-active { background-color: #38bdf8; color: #0f172a; font-weight: bold; }
+        .height-bar { width: 16px; background: linear-gradient(to top, #ef4444, #f59e0b, #10b981); border-radius: 4px; }
+        .highlight-sort { box-shadow: 0 0 0 2px #facc15; background-color: rgba(250, 204, 21, 0.1); border-radius: 4px; padding: 2px 4px; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <nav class="bg-slate-900 border-b border-slate-700 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">🏀 <span class="text-cyan-400">BuzzerBeater</span> 籃球經理 - PPManager</h1>
+            <div class="flex gap-2 flex-wrap">
+                <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition font-semibold">PP球隊總覽</a>
+                <a href="/tactics.html" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition font-semibold">⚔️ 排兵佈陣</a>
+                <a href="/manage.html" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 transition font-semibold">⚙️ 球員數據庫</a>
+                <a href="/stadium.html" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition font-semibold">🏟️ 場館打理</a>
+                
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-6 space-y-6">
+        <div class="card rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4">📊 球隊數據分析</h2>
+            <div class="mb-6">
+                <h3 class="text-base font-bold text-slate-400 mb-3 uppercase tracking-wider">⏱️ 全隊各位置總上場時間 (人手輸入)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-4 text-center" id="pos-minutes-stats"></div>
+            </div>
+            <div class="border-t border-slate-700 pt-4">
+                <h3 class="text-base font-bold text-slate-400 mb-3 uppercase tracking-wider">🏀 位置能力總和與平均</h3>
+                <div class="flex gap-2 mb-4 border-b border-slate-700 pb-2 overflow-x-auto" id="pos-tabs">
+                    <button class="px-4 py-2 rounded-t-lg tab-active whitespace-nowrap text-base" data-pos="ALL">全隊</button>
+                    <button class="px-4 py-2 rounded-t-lg hover:bg-slate-700 whitespace-nowrap text-base" data-pos="PG">PG</button>
+                    <button class="px-4 py-2 rounded-t-lg hover:bg-slate-700 whitespace-nowrap text-base" data-pos="SG">SG</button>
+                    <button class="px-4 py-2 rounded-t-lg hover:bg-slate-700 whitespace-nowrap text-base" data-pos="SF">SF</button>
+                    <button class="px-4 py-2 rounded-t-lg hover:bg-slate-700 whitespace-nowrap text-base" data-pos="PF">PF</button>
+                    <button class="px-4 py-2 rounded-t-lg hover:bg-slate-700 whitespace-nowrap text-base" data-pos="C">C</button>
+                </div>
+                <div id="pos-analysis" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <div class="card rounded-xl shadow-lg p-4 flex flex-wrap gap-4 items-center">
+            <div class="flex items-center gap-2">
+                <label class="text-base text-slate-400">篩選:</label>
+                <select id="filter-pos" class="bg-slate-800 border border-slate-600 text-white rounded px-3 py-2 text-base">
+                    <option value="ALL">全部</option><option value="PG">PG</option><option value="SG">SG</option>
+                    <option value="SF">SF</option><option value="PF">PF</option><option value="C">C</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-base text-slate-400">排序:</label>
+                <select id="sort-by" class="bg-slate-800 border border-slate-600 text-white rounded px-3 py-2 text-base">
+                    <option value="rating">綜合評分</option>
+                    <option value="gameShape">狀態</option>
+                    <option value="age">年齡</option>
+                    <option value="potential">潛力</option>
+                    <option value="outsideTotal">外線總和</option>
+                    <option value="insideTotal">內線總和</option>
+                    <option value="totalMinutes">總上場時間</option>
+                    <option value="height">身高</option>
+                    <option value="jumpShot">跳投</option>
+                    <option value="range">射程</option>
+                    <option value="outsideDef">外防</option>
+                    <option value="handling">控球</option>
+                    <option value="driving">突破</option>
+                    <option value="passing">傳球</option>
+                    <option value="insideShot">內投</option>
+                    <option value="insideDef">內防</option>
+                    <option value="rebound">籃板</option>
+                    <option value="block">封截</option>
+                    <option value="stamina">體能</option>
+                    <option value="freeThrow">罰球</option>
+                    <option value="experience">經驗</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="player-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+    </div>
+
+    <script>
+        let allPlayers = [];
+        let currentSortBy = 'rating';
+
+        async function loadData() {
+            try {
+                const res = await fetch('/api/team-data');
+                allPlayers = await res.json();
+                renderAll();
+            } catch (err) { console.error("載入失敗:", err); }
+        }
+
+        function renderAll() { renderTeamMinutesStats(); renderPosAnalysis(); renderPlayerList(); }
+
+        function renderTeamMinutesStats() {
+            const teamPosMins = { PG: 0, SG: 0, SF: 0, PF: 0, C: 0, TOTAL: 0 };
+            allPlayers.forEach(p => {
+                const pm = p.stats.positionMinutes || { PG:0, SG:0, SF:0, PF:0, C:0 };
+                // 嚴格使用人手輸入的 positionMinutes 加總
+                Object.keys(pm).forEach(pos => {
+                    teamPosMins[pos] += pm[pos];
+                    teamPosMins.TOTAL += pm[pos];
+                });
+            });
+
+            const container = document.getElementById('pos-minutes-stats');
+            let html = '';
+            ['PG', 'SG', 'SF', 'PF', 'C'].forEach(pos => {
+                html += `<div class="p-4 bg-slate-800 rounded-lg border border-slate-700"><div class="text-sm text-slate-400 font-bold mb-1">${pos} 總計</div><div class="text-2xl font-bold text-cyan-400">${teamPosMins[pos]} <span class="text-sm text-slate-500">min</span></div></div>`;
+            });
+            html += `<div class="p-4 bg-emerald-900/30 rounded-lg border border-emerald-700/50"><div class="text-sm text-emerald-400 font-bold mb-1">全隊總計</div><div class="text-2xl font-bold text-emerald-300">${teamPosMins.TOTAL} <span class="text-sm text-emerald-600">min</span></div></div>`;
+            container.innerHTML = html;
+        }
+
+        function renderPosAnalysis() {
+            const tabs = document.querySelectorAll('#pos-tabs button');
+            tabs.forEach(tab => {
+                tab.onclick = () => {
+                    tabs.forEach(t => t.classList.remove('tab-active'));
+                    tab.classList.add('tab-active');
+                    document.getElementById('filter-pos').value = tab.dataset.pos;
+                    renderPosAnalysis(); renderPlayerList();
+                };
+            });
+
+            const targetPos = document.querySelector('#pos-tabs .tab-active').dataset.pos;
+            
+            // 優先使用手動覆蓋的最佳位置 (p.stats.bestPosition)，若無則使用 API 原始位置 (p.bestPosition)
+            const filtered = targetPos === 'ALL' ? allPlayers : allPlayers.filter(p => (p.stats.bestPosition || p.bestPosition) === targetPos);
+
+            if (filtered.length === 0) { document.getElementById('pos-analysis').innerHTML = '<div class="text-slate-500 col-span-2">無此位置球員</div>'; return; }
+
+            const skills = ['jumpShot', 'range', 'outsideDef', 'handling', 'driving', 'passing', 'insideShot', 'insideDef', 'rebound', 'block'];
+            const totals = {}; skills.forEach(s => totals[s] = 0);
+            filtered.forEach(p => skills.forEach(s => totals[s] += p.skills[s]));
+            const count = filtered.length;
+            const container = document.getElementById('pos-analysis');
+            
+            // 【新增】計算內外線總和平均值
+            const outsideTotalAvg = (filtered.reduce((sum, p) => sum + p.skills.outsideTotal, 0) / count).toFixed(1);
+            const insideTotalAvg = (filtered.reduce((sum, p) => sum + p.skills.insideTotal, 0) / count).toFixed(1);
+
+            let html = '';
+            html += `
+                <div class="col-span-1 md:col-span-2 flex justify-center gap-6 mb-6 pb-6 border-b border-slate-700">
+                    <div class="text-center p-4 bg-cyan-900/20 border border-cyan-800/30 rounded-lg flex-1 max-w-xs">
+                        <div class="text-sm text-cyan-400 mb-1 uppercase tracking-wider">外線總和平均</div>
+                        <div class="text-4xl font-bold text-white">${outsideTotalAvg}</div>
+                    </div>
+                    <div class="text-center p-4 bg-rose-900/20 border border-rose-800/30 rounded-lg flex-1 max-w-xs">
+                        <div class="text-sm text-rose-400 mb-1 uppercase tracking-wider">內線總和平均</div>
+                        <div class="text-4xl font-bold text-white">${insideTotalAvg}</div>
+                    </div>
+                </div>
+            `;
+
+            skills.forEach(s => {
+                const total = totals[s]; const avg = (total / count).toFixed(1);
+                const perc = Math.min(100, (total / (count * 20)) * 100);
+                const isOutside = ['jumpShot', 'range', 'outsideDef', 'handling', 'driving', 'passing'].includes(s);
+                const color = isOutside ? 'bg-cyan-500' : 'bg-rose-500';
+                html += `<div class="flex items-center gap-3"><div class="w-20 text-base text-slate-400 text-right">${s}</div><div class="flex-1 bar-bg rounded-full h-4"><div class="${color} h-4 rounded-full" style="width: ${perc}%"></div></div><div class="w-32 text-base text-right"><span class="text-white font-bold">${total}</span> <span class="text-slate-500">(Avg: ${avg})</span></div></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderPlayerList() {
+            const filterPos = document.getElementById('filter-pos').value;
+            currentSortBy = document.getElementById('sort-by').value;
+            
+            document.getElementById('filter-pos').onchange = (e) => {
+                document.querySelectorAll('#pos-tabs button').forEach(t => t.classList.toggle('tab-active', t.dataset.pos === e.target.value));
+                renderPosAnalysis(); renderPlayerList();
+            };
+            document.getElementById('sort-by').onchange = () => renderPlayerList();
+
+            let filtered = filterPos === 'ALL' ? [...allPlayers] : allPlayers.filter(p => p.bestPosition === filterPos);
+            
+            // 【修復】針對 totalMinutes 特殊處理，直接計算 positionMinutes 加總，確保排序與顯示一致
+            filtered.sort((a, b) => {
+                let valA, valB;
+                if (currentSortBy === 'totalMinutes') {
+                    const pmA = a.stats.positionMinutes || {};
+                    const pmB = b.stats.positionMinutes || {};
+                    valA = Object.values(pmA).reduce((s, v) => s + (parseInt(v)||0), 0);
+                    valB = Object.values(pmB).reduce((s, v) => s + (parseInt(v)||0), 0);
+                } else {
+                    valA = a.skills[currentSortBy] ?? a.stats[currentSortBy] ?? a[currentSortBy] ?? 0;
+                    valB = b.skills[currentSortBy] ?? b.stats[currentSortBy] ?? b[currentSortBy] ?? 0;
+                }
+                // 【修改】年齡按升序 (由少到大)，其他指標保持降序 (由大到小)
+                if (currentSortBy === 'age') {
+                    return valA - valB;
+                }
+                return valB - valA;
+            });
+
+            // ... (後面的卡片渲染邏輯保持不變) ...
+
+            const container = document.getElementById('player-list');
+            container.innerHTML = '';
+
+            filtered.forEach(p => {
+                const s = p.skills; const st = p.stats;
+                const finalPosition = p.stats.bestPosition || p.bestPosition;
+                const pm = st.positionMinutes || { PG:0, SG:0, SF:0, PF:0, C:0 };
+                const totalAllPos = Object.values(pm).reduce((a,b)=>a+b, 0); // 嚴格使用 positionMinutes 加總
+                const heightCm = Math.round(p.height * 2.54);
+                const heightPx = 40 + ((Math.max(170, Math.min(220, heightCm)) - 170) / 50) * 120;
+                const overrideBadge = p.isOverridden ? '<span class="ml-2 px-2 py-1 bg-amber-900 text-amber-300 text-sm rounded">已修正</span>' : '';
+
+                const timeDisplayHtml = `
+                    <div class="text-base text-slate-300 mt-2 flex flex-wrap gap-x-3 gap-y-1">
+                        <span>PG:<span class="text-cyan-400 font-bold">${pm.PG}</span></span>
+                        <span>SG:<span class="text-cyan-400 font-bold">${pm.SG}</span></span>
+                        <span>SF:<span class="text-cyan-400 font-bold">${pm.SF}</span></span>
+                        <span>PF:<span class="text-cyan-400 font-bold">${pm.PF}</span></span>
+                        <span>C:<span class="text-cyan-400 font-bold">${pm.C}</span></span>
+                        <span class="ml-auto text-white font-bold">總: ${totalAllPos}m</span>
+                    </div>
+                `;
+
+                const card = document.createElement('div');
+                card.className = 'card rounded-xl shadow-lg p-4 flex gap-4 hover:border-cyan-500/50 transition';
+                card.innerHTML = `
+                    <div class="flex flex-col items-center justify-end h-56 w-10 bg-slate-800 rounded-lg p-1 relative">
+                        <div class="height-bar" style="height: ${heightPx}px;"></div>
+                        <div class="text-sm text-slate-400 mt-1">${heightCm}cm</div>
+                    </div>
+                    <div class="flex-1 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-xl font-bold text-white">#${p.jersey} ${p.firstName} ${p.lastName} ${overrideBadge}</h3>
+                                <div class="text-base text-slate-400">
+                                    <span class="px-2 py-1 bg-blue-900 text-blue-300 rounded font-bold">${finalPosition}</span>
+                                    <span class="ml-2">Rating: <span class="text-emerald-400 font-bold text-lg ${currentSortBy === 'rating' ? 'highlight-sort' : ''}">${st.rating}</span></span>
+                                </div>
+                            </div>
+                            <div class="text-right text-base text-slate-400 ${currentSortBy === 'totalMinutes' ? 'highlight-sort' : ''}">
+                                總計 <span class="text-cyan-400 font-bold text-xl">${totalAllPos}</span> min
+                            </div>
+                        </div>
+                        ${timeDisplayHtml}
+                        <div class="grid grid-cols-3 gap-2 text-base">
+                            <div class="${currentSortBy === 'gameShape' ? 'highlight-sort' : ''}">
+                                <div class="flex justify-between mb-1"><span class="text-slate-400">狀態</span><span class="text-white font-bold">${s.gameShape}</span></div>
+                                <div class="bar-bg rounded-full h-2"><div class="bg-emerald-500 h-2 rounded-full" style="width: ${(s.gameShape/10)*100}%"></div></div>
+                            </div>
+                            <div class="${currentSortBy === 'potential' ? 'highlight-sort' : ''}">
+                                <div class="flex justify-between mb-1"><span class="text-slate-400">潛力</span><span class="text-white font-bold">${s.potential}</span></div>
+                                <div class="bar-bg rounded-full h-2"><div class="bg-amber-500 h-2 rounded-full" style="width: ${(s.potential/10)*100}%"></div></div>
+                            </div>
+                            <div class="${currentSortBy === 'age' ? 'highlight-sort' : ''}">
+                                <div class="flex justify-between mb-1"><span class="text-slate-400">年齡</span><span class="text-white font-bold">${p.age}</span></div>
+                                <div class="bar-bg rounded-full h-2"><div class="bg-slate-500 h-2 rounded-full" style="width: ${(p.age/40)*100}%"></div></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1.5">
+                                <div class="text-base font-bold text-cyan-400 uppercase tracking-wider ${currentSortBy === 'outsideTotal' ? 'highlight-sort' : ''}">外線 (${s.outsideTotal})</div>
+                                ${renderSkillBar('跳投', s.jumpShot, 'bg-cyan-600', 'jumpShot')}
+                                ${renderSkillBar('射程', s.range, 'bg-cyan-600', 'range')}
+                                ${renderSkillBar('外防', s.outsideDef, 'bg-cyan-600', 'outsideDef')}
+                                ${renderSkillBar('控球', s.handling, 'bg-cyan-600', 'handling')}
+                                ${renderSkillBar('突破', s.driving, 'bg-cyan-600', 'driving')}
+                                ${renderSkillBar('傳球', s.passing, 'bg-cyan-600', 'passing')}
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="text-base font-bold text-rose-400 uppercase tracking-wider ${currentSortBy === 'insideTotal' ? 'highlight-sort' : ''}">內線 (${s.insideTotal})</div>
+                                ${renderSkillBar('內投', s.insideShot, 'bg-rose-600', 'insideShot')}
+                                ${renderSkillBar('內防', s.insideDef, 'bg-rose-600', 'insideDef')}
+                                ${renderSkillBar('籃板', s.rebound, 'bg-rose-600', 'rebound')}
+                                ${renderSkillBar('封截', s.block, 'bg-rose-600', 'block')}
+                                <div class="pt-2 border-t border-slate-700 mt-2 space-y-1.5">
+                                    ${renderSkillBar('體能', s.stamina, 'bg-orange-500', 'stamina')}
+                                    ${renderSkillBar('罰球', s.freeThrow, 'bg-yellow-500', 'freeThrow')}
+                                    ${renderSkillBar('經驗', s.experience, 'bg-purple-500', 'experience')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderSkillBar(label, val, color, skillKey) {
+            const isHighlighted = skillKey === currentSortBy;
+            const highlightClass = isHighlighted ? 'highlight-sort' : '';
+            const perc = Math.min(100, (val / 20) * 100);
+            return `
+                <div class="flex items-center gap-2 text-base ${highlightClass}">
+                    <span class="w-10 text-slate-400">${label}</span>
+                    <div class="flex-1 bar-bg rounded-full h-2">
+                        <div class="${color} h-2 rounded-full" style="width: ${perc}%"></div>
+                    </div>
+                    <span class="w-6 text-right text-white font-bold">${val}</span>
+                </div>
+            `;
+        }
+        loadData();
+    </script>
+</body>
+</html>

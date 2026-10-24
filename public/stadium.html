@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>場館打理 - BuzzerBeater</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <nav class="bg-slate-900 border-b border-slate-700 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">🏟️ <span class="text-purple-400">場館打理計劃</span></h1>
+            <div class="flex gap-2 flex-wrap">
+                <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition font-semibold">PP球隊總覽</a>
+                <a href="/tactics.html" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition font-semibold">⚔️ 排兵佈陣</a>
+                <a href="/manage.html" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 transition font-semibold">⚙️ 球員數據庫</a>
+                <a href="/stadium.html" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition font-semibold">🏟️ 場館打理</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-6 space-y-6">
+        <!-- 場館座位詳情 (來自 arena.aspx) -->
+        <div class="card rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">🏟️ 場館座位分佈 (Team ID: 197615)</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="seats-grid">
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 text-center">
+                    <div class="text-xs text-slate-400 mb-1">總座位數</div>
+                    <div class="text-2xl font-bold text-emerald-400" id="total-seats">-</div>
+                </div>
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 text-center">
+                    <div class="text-xs text-slate-400 mb-1">普通座位 (Regular)</div>
+                    <div class="text-2xl font-bold text-cyan-400" id="regular-seats">-</div>
+                </div>
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 text-center">
+                    <div class="text-xs text-slate-400 mb-1">VIP 座位</div>
+                    <div class="text-2xl font-bold text-amber-400" id="vip-seats">-</div>
+                </div>
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 text-center">
+                    <div class="text-xs text-slate-400 mb-1">屋頂座位 (Roof)</div>
+                    <div class="text-2xl font-bold text-purple-400" id="roof-seats">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 擴建估算器 -->
+        <div class="card rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">🏗️ 場館擴建收益估算器</h2>
+            <p class="text-sm text-slate-400 mb-4">* BBAPI 未直接提供擴建成本公式，請根據遊戲內實際情況輸入預估參數。通常每次擴建成本會遞增。</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-slate-400 mb-2">單次擴建成本 ($)</label>
+                            <input type="number" id="input-cost" value="500000" class="w-full bg-slate-800 border border-slate-600 text-white rounded px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-slate-400 mb-2">單次新增座位</label>
+                            <input type="number" id="input-seats" value="500" class="w-full bg-slate-800 border border-slate-600 text-white rounded px-4 py-2">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-2">預計擴建次數</label>
+                        <input type="number" id="expand-count" value="1" min="1" max="20" class="w-full bg-slate-800 border border-slate-600 text-white rounded px-4 py-2 text-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-2">預估平均票價 ($)</label>
+                        <input type="number" id="input-price" value="40" class="w-full bg-slate-800 border border-slate-600 text-white rounded px-4 py-2">
+                    </div>
+                    <button id="calc-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">計算擴建效益</button>
+                </div>
+
+                <div class="bg-slate-800/30 rounded-lg p-6 border border-slate-700">
+                    <h4 class="text-lg font-bold text-white mb-4">📈 預估效益分析</h4>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center pb-3 border-b border-slate-700">
+                            <span class="text-slate-400">總擴建成本</span>
+                            <span class="text-2xl font-bold text-red-400" id="res-cost">0</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-3 border-b border-slate-700">
+                            <span class="text-slate-400">新增總座位數</span>
+                            <span class="text-2xl font-bold text-cyan-400" id="res-seats">0</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-3 border-b border-slate-700">
+                            <span class="text-slate-400">預估每週收益增加 (滿座)</span>
+                            <span class="text-2xl font-bold text-emerald-400" id="res-weekly">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400">預估回本週數</span>
+                            <span class="text-2xl font-bold text-amber-400" id="res-roi">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stadiumData = null;
+
+        async function loadData() {
+            try {
+                const res = await fetch('/api/stadium-data');
+                stadiumData = await res.json();
+                renderStadium();
+            } catch (err) {
+                console.error("載入場館數據失敗:", err);
+                document.getElementById('total-seats').textContent = "讀取失敗";
+            }
+        }
+
+        function renderStadium() {
+            // 適配 arena.aspx 可能返回的節點名稱 (total/totalSeats, regular/regularSeats 等)
+            const total = stadiumData.total || stadiumData.totalSeats || 0;
+            const regular = stadiumData.regular || stadiumData.regularSeats || 0;
+            const vip = stadiumData.vip || stadiumData.vipSeats || 0;
+            const roof = stadiumData.roof || stadiumData.roofSeats || 0;
+
+            document.getElementById('total-seats').textContent = Number(total).toLocaleString();
+            document.getElementById('regular-seats').textContent = Number(regular).toLocaleString();
+            document.getElementById('vip-seats').textContent = Number(vip).toLocaleString();
+            document.getElementById('roof-seats').textContent = Number(roof).toLocaleString();
+
+            document.getElementById('calc-btn').onclick = calculateROI;
+        }
+
+        function calculateROI() {
+            const baseCost = parseInt(document.getElementById('input-cost').value) || 0;
+            const baseSeats = parseInt(document.getElementById('input-seats').value) || 0;
+            const count = parseInt(document.getElementById('expand-count').value) || 1;
+            const ticketPrice = parseInt(document.getElementById('input-price').value) || 0;
+            
+            const totalCost = baseCost * count;
+            const totalNewSeats = baseSeats * count;
+            const weeklyIncome = totalNewSeats * ticketPrice;
+            const roiWeeks = weeklyIncome > 0 ? Math.ceil(totalCost / weeklyIncome) : '∞';
+
+            document.getElementById('res-cost').textContent = `$${totalCost.toLocaleString()}`;
+            document.getElementById('res-seats').textContent = `+${totalNewSeats.toLocaleString()}`;
+            document.getElementById('res-weekly').textContent = `+$${weeklyIncome.toLocaleString()}`;
+            document.getElementById('res-roi').textContent = `${roiWeeks} 週`;
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

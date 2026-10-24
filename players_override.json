@@ -1,0 +1,649 @@
+{
+  "53526116": {
+    "skills": {
+      "jumpShot": 9,
+      "range": 7,
+      "outsideDef": 9,
+      "handling": 8,
+      "driving": 9,
+      "passing": 6,
+      "insideShot": 9,
+      "insideDef": 10,
+      "rebound": 4,
+      "block": 4,
+      "stamina": 4,
+      "freeThrow": 12,
+      "experience": 5
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "PF"
+    }
+  },
+  "54102538": {
+    "skills": {
+      "jumpShot": 14,
+      "range": 9,
+      "outsideDef": 8,
+      "handling": 8,
+      "driving": 12,
+      "passing": 9,
+      "insideShot": 9,
+      "insideDef": 5,
+      "rebound": 2,
+      "block": 7,
+      "stamina": 6,
+      "freeThrow": 13,
+      "experience": 3
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "SG"
+    }
+  },
+  "54543188": {
+    "skills": {
+      "jumpShot": 8,
+      "range": 10,
+      "outsideDef": 8,
+      "handling": 9,
+      "driving": 5,
+      "passing": 10,
+      "insideShot": 8,
+      "insideDef": 5,
+      "rebound": 3,
+      "block": 7,
+      "stamina": 2,
+      "freeThrow": 17,
+      "experience": 3
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "PG"
+    }
+  },
+  "54543194": {
+    "skills": {
+      "jumpShot": 10,
+      "range": 5,
+      "outsideDef": 7,
+      "handling": 10,
+      "driving": 7,
+      "passing": 8,
+      "insideShot": 9,
+      "insideDef": 5,
+      "rebound": 10,
+      "block": 10,
+      "stamina": 6,
+      "freeThrow": 18,
+      "experience": 4
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "PF"
+    }
+  },
+  "54859055": {
+    "skills": {
+      "jumpShot": 9,
+      "range": 8,
+      "outsideDef": 10,
+      "handling": 6,
+      "driving": 8,
+      "passing": 4,
+      "insideShot": 5,
+      "insideDef": 2,
+      "rebound": 7,
+      "block": 2,
+      "stamina": 8,
+      "freeThrow": 8,
+      "experience": 1
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "SG"
+    }
+  },
+  "54893888": {
+    "skills": {
+      "jumpShot": 10,
+      "range": 8,
+      "outsideDef": 9,
+      "handling": 9,
+      "driving": 8,
+      "passing": 9,
+      "insideShot": 3,
+      "insideDef": 3,
+      "rebound": 5,
+      "block": 1,
+      "stamina": 8,
+      "freeThrow": 11,
+      "experience": 4
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "PG"
+    }
+  },
+  "54945877": {
+    "skills": {
+      "jumpShot": 12,
+      "range": 9,
+      "outsideDef": 10,
+      "handling": 11,
+      "driving": 5,
+      "passing": 8,
+      "insideShot": 9,
+      "insideDef": 8,
+      "rebound": 2,
+      "block": 8,
+      "stamina": 8,
+      "freeThrow": 9,
+      "experience": 2
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "SF"
+    }
+  },
+  "54950319": {
+    "skills": {
+      "jumpShot": 3,
+      "range": 7,
+      "outsideDef": 10,
+      "handling": 6,
+      "driving": 9,
+      "passing": 8,
+      "insideShot": 8,
+      "insideDef": 4,
+      "rebound": 5,
+      "block": 9,
+      "stamina": 3,
+      "freeThrow": 5,
+      "experience": 1
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "SF"
+    }
+  },
+  "55162789": {
+    "skills": {
+      "jumpShot": 8,
+      "range": 3,
+      "outsideDef": 8,
+      "handling": 3,
+      "driving": 6,
+      "passing": 8,
+      "insideShot": 9,
+      "insideDef": 10,
+      "rebound": 4,
+      "block": 9,
+      "stamina": 2,
+      "freeThrow": 18,
+      "experience": 3
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "PF"
+    }
+  },
+  "55279069": {
+    "skills": {
+      "jumpShot": 9,
+      "range": 8,
+      "outsideDef": 7,
+      "handling": 10,
+      "driving": 10,
+      "passing": 9,
+      "insideShot": 3,
+      "insideDef": 9,
+      "rebound": 5,
+      "block": 7,
+      "stamina": 9,
+      "freeThrow": 6,
+      "experience": 2
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "SG"
+    }
+  },
+  "55579726": {
+    "skills": {
+      "jumpShot": 8,
+      "range": 4,
+      "outsideDef": 1,
+      "handling": 7,
+      "driving": 3,
+      "passing": 3,
+      "insideShot": 6,
+      "insideDef": 9,
+      "rebound": 9,
+      "block": 7,
+      "stamina": 2,
+      "freeThrow": 2,
+      "experience": 1
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "C"
+    }
+  },
+  "55597652": {
+    "skills": {
+      "jumpShot": 10,
+      "range": 7,
+      "outsideDef": 7,
+      "handling": 11,
+      "driving": 11,
+      "passing": 5,
+      "insideShot": 10,
+      "insideDef": 8,
+      "rebound": 5,
+      "block": 4,
+      "stamina": 6,
+      "freeThrow": 10,
+      "experience": 1
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "SF"
+    }
+  },
+  "56255447": {
+    "skills": {
+      "jumpShot": 8,
+      "range": 8,
+      "outsideDef": 9,
+      "handling": 10,
+      "driving": 10,
+      "passing": 9,
+      "insideShot": 6,
+      "insideDef": 2,
+      "rebound": 3,
+      "block": 1,
+      "stamina": 9,
+      "freeThrow": 9,
+      "experience": 13
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "PG"
+    }
+  },
+  "56255448": {
+    "skills": {
+      "jumpShot": 3,
+      "range": 3,
+      "outsideDef": 5,
+      "handling": 5,
+      "driving": 2,
+      "passing": 7,
+      "insideShot": 9,
+      "insideDef": 11,
+      "rebound": 10,
+      "block": 6,
+      "stamina": 6,
+      "freeThrow": 8,
+      "experience": 8
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "C"
+    }
+  },
+  "56255449": {
+    "skills": {
+      "jumpShot": 9,
+      "range": 1,
+      "outsideDef": 3,
+      "handling": 3,
+      "driving": 2,
+      "passing": 3,
+      "insideShot": 9,
+      "insideDef": 9,
+      "rebound": 9,
+      "block": 6,
+      "stamina": 5,
+      "freeThrow": 9,
+      "experience": 7
+    },
+    "stats": {
+      "positionMinutes": {
+        "PG": 0,
+        "SG": 0,
+        "SF": 0,
+        "PF": 0,
+        "C": 0
+      },
+      "bestPosition": "C"
+    }
+  },
+  "__saved_lineups__": [
+    {
+      "id": "1792827920496",
+      "name": "正選1",
+      "lineup": {
+        "PG": {
+          "starter": "56255447",
+          "backup": null,
+          "reserve": null
+        },
+        "SG": {
+          "starter": "54102538",
+          "backup": null,
+          "reserve": null
+        },
+        "SF": {
+          "starter": "55279069",
+          "backup": null,
+          "reserve": null
+        },
+        "PF": {
+          "starter": "54543194",
+          "backup": null,
+          "reserve": null
+        },
+        "C": {
+          "starter": "56255448",
+          "backup": null,
+          "reserve": null
+        }
+      },
+      "avgSkills": {
+        "jumpShot": 8.8,
+        "range": 6.6,
+        "outsideDef": 7.2,
+        "handling": 8.6,
+        "driving": 8.2,
+        "passing": 8.4,
+        "insideShot": 7.2,
+        "insideDef": 6.4,
+        "rebound": 6,
+        "block": 6.2,
+        "stamina": 7.2,
+        "freeThrow": 10.8,
+        "experience": 6,
+        "outsideAvg": 47.8,
+        "insideAvg": 25.8
+      }
+    },
+    {
+      "id": "1792828013609",
+      "name": "替補1",
+      "lineup": {
+        "PG": {
+          "starter": null,
+          "backup": "54893888",
+          "reserve": null
+        },
+        "SG": {
+          "starter": null,
+          "backup": "54945877",
+          "reserve": null
+        },
+        "SF": {
+          "starter": null,
+          "backup": "54945877",
+          "reserve": null
+        },
+        "PF": {
+          "starter": null,
+          "backup": "54543194",
+          "reserve": null
+        },
+        "C": {
+          "starter": null,
+          "backup": "56255449",
+          "reserve": null
+        }
+      },
+      "avgSkills": {
+        "jumpShot": 10.3,
+        "range": 5.8,
+        "outsideDef": 7.3,
+        "handling": 8.3,
+        "driving": 5.5,
+        "passing": 7,
+        "insideShot": 7.5,
+        "insideDef": 6.3,
+        "rebound": 6.5,
+        "block": 6.3,
+        "stamina": 6.8,
+        "freeThrow": 11.8,
+        "experience": 4.3,
+        "outsideAvg": 44,
+        "insideAvg": 26.5
+      }
+    },
+    {
+      "id": "1792828053220",
+      "name": "後備1",
+      "lineup": {
+        "PG": {
+          "starter": null,
+          "backup": null,
+          "reserve": "54543188"
+        },
+        "SG": {
+          "starter": null,
+          "backup": null,
+          "reserve": "54543188"
+        },
+        "SF": {
+          "starter": null,
+          "backup": null,
+          "reserve": "55597652"
+        },
+        "PF": {
+          "starter": null,
+          "backup": null,
+          "reserve": "55162789"
+        },
+        "C": {
+          "starter": null,
+          "backup": null,
+          "reserve": "55162789"
+        }
+      },
+      "avgSkills": {
+        "jumpShot": 8.7,
+        "range": 6.7,
+        "outsideDef": 7.7,
+        "handling": 7.7,
+        "driving": 7.3,
+        "passing": 7.7,
+        "insideShot": 9,
+        "insideDef": 7.7,
+        "rebound": 4,
+        "block": 6.7,
+        "stamina": 3.3,
+        "freeThrow": 15,
+        "experience": 2.3,
+        "outsideAvg": 45.7,
+        "insideAvg": 27.3
+      }
+    },
+    {
+      "id": "1792828145418",
+      "name": "正選2",
+      "lineup": {
+        "PG": {
+          "starter": "56255447",
+          "backup": null,
+          "reserve": null
+        },
+        "SG": {
+          "starter": "54102538",
+          "backup": null,
+          "reserve": null
+        },
+        "SF": {
+          "starter": "54945877",
+          "backup": null,
+          "reserve": null
+        },
+        "PF": {
+          "starter": "54543194",
+          "backup": null,
+          "reserve": null
+        },
+        "C": {
+          "starter": "56255448",
+          "backup": null,
+          "reserve": null
+        }
+      },
+      "avgSkills": {
+        "jumpShot": 9.4,
+        "range": 6.8,
+        "outsideDef": 7.8,
+        "handling": 8.8,
+        "driving": 7.2,
+        "passing": 8.2,
+        "insideShot": 8.4,
+        "insideDef": 6.2,
+        "rebound": 5.4,
+        "block": 6.4,
+        "stamina": 7,
+        "freeThrow": 11.4,
+        "experience": 6,
+        "outsideAvg": 48.2,
+        "insideAvg": 26.4
+      }
+    },
+    {
+      "id": "1792828242106",
+      "name": "替補2",
+      "lineup": {
+        "PG": {
+          "starter": null,
+          "backup": "54893888",
+          "reserve": null
+        },
+        "SG": {
+          "starter": null,
+          "backup": "54945877",
+          "reserve": null
+        },
+        "SF": {
+          "starter": null,
+          "backup": "55279069",
+          "reserve": null
+        },
+        "PF": {
+          "starter": null,
+          "backup": "55162789",
+          "reserve": null
+        },
+        "C": {
+          "starter": null,
+          "backup": "56255449",
+          "reserve": null
+        }
+      },
+      "avgSkills": {
+        "jumpShot": 9.6,
+        "range": 5.8,
+        "outsideDef": 7.4,
+        "handling": 7.2,
+        "driving": 6.2,
+        "passing": 7.4,
+        "insideShot": 6.6,
+        "insideDef": 7.8,
+        "rebound": 5,
+        "block": 6.2,
+        "stamina": 6.4,
+        "freeThrow": 10.6,
+        "experience": 3.6,
+        "outsideAvg": 43.6,
+        "insideAvg": 25.6
+      }
+    }
+  ]
+}
