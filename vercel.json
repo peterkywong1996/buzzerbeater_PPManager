@@ -1,8 +1,12 @@
 {
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.js"
-    }
-  ]
+  "name": "vercel-node-html-app",
+  "version": "1.0.0",
+  "description": "Deploy Node.js and HTML on Vercel",
+  "main": "api/index.js",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "scripts": {
+    "start": "node api/index.js"
+  }
 }
