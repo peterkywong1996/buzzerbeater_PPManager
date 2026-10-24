@@ -5,19 +5,27 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-
-app.get('/api/hello', (req, res) => {
-  res.json({ message: "Hello from Node.js on Vercel!" });
-});
-
-module.exports = app;
-
 const port = process.env.PORT || 3000; // const PORT = 3000
 const OVERRIDE_FILE = path.join(__dirname, 'players_override.json');
 const LINEUPS_KEY = '__saved_lineups__'; // 特殊 Key 用於存儲陣容
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '5mb' }));
+
+app.get('/api/hello', (req, res) => {
+  res.json({
+    status: 'success',
+    message: "Hello from Node.js on Vercel!"
+  });
+});
+
+// 資料處理 API 範例 (網址會是： 你的網址/api/data)
+app.post('/api/data', (req, res) => {
+  const { name } = req.body;
+  res.json({ message: `收到了，謝謝你 ${name || '訪客'}` });
+});
+
+module.exports = app;
 
 const BASE_URL = 'http://bbapi.buzzerbeater.com';
 const LOGIN = 'PPManager';
